@@ -1,0 +1,23 @@
+*{
+    box-sizing: border-box;
+}
+body{
+    background: linear-gradient(135deg, #74b9ff, #a29bfe);
+    min-height: 100vh;
+    font-family: "微软雅黑",sans-serif;
+}
+.card{
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: none;
+}
+.weather-big{
+    font-size: 4rem;
+}
+.temp-num{
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+.nav-dark{
+    background: rgba(0,0,0,0.2) !important;
+}
