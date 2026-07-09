@@ -1,51 +1,59 @@
-// 城市编码 濮阳各区县
-const cityCode = {
-    hualong: "101180701",   //华龙区
-    puyangxian: "101180702",//濮阳县
-    qingfeng: "101180703",  //清丰
-    nanle: "101180704",     //南乐
-    fanxian: "101180705",   //范县
-    taiqian: "101180706"    //台前
-};
-let nowCity = cityCode.hualong;
+// 濮阳坐标
+const lat = 35.7762;
+const lon = 115.0186;
 
-// 替换你自己的和风天气key（官网免费申请）
-const KEY = "ce986bb35e634271a49606ab2a226583";
-
-// 加载实时天气
-async function getNowWeather(){
-    const res = await fetch(`https://devapi.qweather.com/v7/weather/now?location=${nowCity}&key=${KEY}`);
-    const data = await res.json();
-    if(data.code !== "200"){
-        alert("天气数据获取失败，请检查key");
-        return;
-    }
-    const now = data.now;
-    document.getElementById("temp").innerText = now.temp;
-    document.getElementById("feels").innerText = now.feelsLike;
-    document.getElementById("text").innerText = now.text;
-    document.getElementById("wind").innerText = now.windDir + now.windScale + "级";
-    document.getElementById("humidity").innerText = now.humidity;
-    document.getElementById("icon").innerText = getWeatherIcon(now.icon);
-}
-
-// 天气图标转换
-function getWeatherIcon(icon){
-    const map = {
-        "100":"☀️","101":"⛅","102":"⛅","103":"🌤️","104":"☁️",
-        "300":"🌧️","301":"🌦️","400":"🌨️","500":"🌫️","999":"🌪️"
-    };
-    return map[icon] || "🌤️";
-}
-
-// 切换区县
-document.getElementById("citySelect").addEventListener("change",function(){
+// 区县切换绑定
+document.getElementById("citySelect").addEventListener("change", function () {
     const val = this.value;
-    nowCity = cityCode[val];
-    getNowWeather();
+    let newLat, newLon;
+    switch (val) {
+        case "hualong": newLat = 35.7762; newLon = 115.0186; break;
+        case "puyangxian": newLat = 35.6980; newLon = 114.9560; break;
+        case "qingfeng": newLat = 35.8960; newLon = 115.1010; break;
+        case "nanle": newLat = 36.0730; newLon = 115.2080; break;
+        case "fanxian": newLat = 35.7520; newLon = 115.4760; break;
+        case "taiqian": newLat = 35.9350; newLon = 115.7820; break;
+        default: newLat = 35.7762; newLon = 115.0186;
+    }
+    getNowWeather(newLat, newLon);
 })
 
-// 页面加载执行
-window.onload = function(){
+// 天气编码转文字+图标
+function getWeatherInfo(code) {
+    const map = {
+        0: { icon: "☀️", text: "晴天" },
+        1: { icon: "⛅", text: "大部晴朗" },
+        2: { icon: "⛅", text: "多云" },
+        3: { icon: "☁️", text: "阴天" },
+        45: { icon: "🌫️", text: "雾" },
+        48: { icon: "🌫️", text: "霜雾" },
+        51: { icon: "🌧️", text: "小雨" },
+        53: { icon: "🌧️", text: "中雨" },
+        55: { icon: "🌧️", text: "大雨" },
+        61: { icon: "🌨️", text: "小雪" },
+        71: { icon: "❄️", text: "大雪" },
+        80: { icon: "🌦️", text: "阵雨" },
+        95: { icon: "⛈️", text: "雷阵雨" }
+    }
+    return map[code] || { icon: "🌤️", text: "未知天气" };
+}
+
+// 获取实时天气
+async function getNowWeather(latitude = lat, longitude = lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m&wind_speed_unit=kmh&timezone=Asia/Shanghai`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const curr = data.current;
+
+    const weather = getWeatherInfo(curr.weather_code);
+    document.getElementById("icon").innerText = weather.icon;
+    document.getElementById("temp").innerText = curr.temperature_2m;
+    document.getElementById("feels").innerText = curr.apparent_temperature;
+    document.getElementById("text").innerText = weather.text;
+    document.getElementById("humidity").innerText = curr.relative_humidity_2m;
+    document.getElementById("wind").innerText = `${curr.wind_direction_10m}° ${curr.wind_speed_10m} km/h`;
+}
+
+window.onload = function () {
     getNowWeather();
 }
