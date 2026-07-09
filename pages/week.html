@@ -20,31 +20,49 @@
     </div>
 </div>
 <footer class="text-center text-white py-3 mt-5">
-    <small>7天长期预报</small>
+    <small>7天长期预报 | Open-Meteo免费气象数据</small>
 </footer>
 <script>
-const KEY = "ce986bb35e634271a49606ab2a226583";
-let cityCode = "101180701";
-async function loadWeek(){
-    const res = await fetch(`https://devapi.qweather.com/v7/weather/7d?location=${cityCode}&key=${KEY}`);
-    const d = await res.json();
-    const wrap = document.getElementById("weekBox");
-    wrap.innerHTML = "";
-    d.daily.forEach(item=>{
-        wrap.innerHTML += `
-        <div class="col-md-3">
-            <div class="card p-3 text-center">
-                <h5>${item.fxDate}</h5>
-                <div style="font-size:2.5rem">${getIcon(item.iconDay)}</div>
-                <p>${item.textDay}</p>
-                <p>最高${item.tempMax}℃ / 最低${item.tempMin}℃</p>
-            </div>
-        </div>`;
-    })
+const lat = 35.7762;
+const lon = 115.0186;
+
+// 天气编码转图标
+function getWeatherIcon(code) {
+    const map = {
+        0: "☀️", 1: "⛅", 2: "⛅", 3: "☁️",
+        45: "🌫️", 51: "🌧️", 61: "🌨️", 80: "🌦️", 95: "⛈️"
+    }
+    return map[code] || "🌤️";
 }
-function getIcon(icon){
-    const map = {"100":"☀️","101":"⛅","300":"🌧️","400":"🌨️","500":"🌫️"};
-    return map[icon] || "🌤️";
+
+async function loadWeek() {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Asia/Shanghai`;
+    try {
+        const res = await fetch(url);
+        const d = await res.json();
+        const daily = d.daily;
+        const wrap = document.getElementById("weekBox");
+        wrap.innerHTML = "";
+
+        for (let i = 0; i < daily.time.length; i++) {
+            const date = daily.time[i];
+            const icon = getWeatherIcon(daily.weather_code[i]);
+            const maxTemp = daily.temperature_2m_max[i];
+            const minTemp = daily.temperature_2m_min[i];
+            wrap.innerHTML += `
+            <div class="col-md-3 col-6">
+                <div class="card p-3 text-center">
+                    <h5>${date}</h5>
+                    <div style="font-size:2.5rem;margin:10px 0;">${icon}</div>
+                    <p class="mb-0">最高${maxTemp}℃</p>
+                    <p class="mb-0">最低${minTemp}℃</p>
+                </div>
+            </div>`;
+        }
+    } catch (err) {
+        document.getElementById("weekBox").innerHTML = `<div class="col-12 text-center text-white">数据加载失败</div>`;
+        console.error(err);
+    }
 }
 window.onload = loadWeek;
 </script>
