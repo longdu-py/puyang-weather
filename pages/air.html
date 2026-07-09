@@ -27,7 +27,7 @@
     <small>空气质量监测数据</small>
 </footer>
 <script>
-const KEY = "你的和风天气KEY";
+const KEY = "ce986bb35e634271a49606ab2a226583";
 async function getAir(){
     const res = await fetch(`https://devapi.qweather.com/v7/air/now?location=101180701&key=${KEY}`);
     const d = await res.json();
