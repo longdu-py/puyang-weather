@@ -10,7 +10,7 @@ const cityCode = {
 let nowCity = cityCode.hualong;
 
 // 替换你自己的和风天气key（官网免费申请）
-const KEY = "你的和风天气KEY";
+const KEY = "ce986bb35e634271a49606ab2a226583";
 
 // 加载实时天气
 async function getNowWeather(){
