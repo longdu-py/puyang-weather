@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>濮阳7日天气预报</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/weather.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark nav-dark">
+    <div class="container">
+        <a class="navbar-brand" href="../index.html">🌤️ 返回首页</a>
+    </div>
+</nav>
+<div class="container py-4">
+    <h3 class="text-center text-white mb-4">濮阳7天天气预报</h3>
+    <div class="row g-3" id="weekBox">
+        <div class="col-12 text-center text-white">加载中...</div>
+    </div>
+</div>
+<footer class="text-center text-white py-3 mt-5">
+    <small>7天长期预报</small>
+</footer>
+<script>
+const KEY = "你的和风天气KEY";
+let cityCode = "101180701";
+async function loadWeek(){
+    const res = await fetch(`https://devapi.qweather.com/v7/weather/7d?location=${cityCode}&key=${KEY}`);
+    const d = await res.json();
+    const wrap = document.getElementById("weekBox");
+    wrap.innerHTML = "";
+    d.daily.forEach(item=>{
+        wrap.innerHTML += `
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <h5>${item.fxDate}</h5>
+                <div style="font-size:2.5rem">${getIcon(item.iconDay)}</div>
+                <p>${item.textDay}</p>
+                <p>最高${item.tempMax}℃ / 最低${item.tempMin}℃</p>
+            </div>
+        </div>`;
+    })
+}
+function getIcon(icon){
+    const map = {"100":"☀️","101":"⛅","300":"🌧️","400":"🌨️","500":"🌫️"};
+    return map[icon] || "🌤️";
+}
+window.onload = loadWeek;
+</script>
+</body>
+</html>
