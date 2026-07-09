@@ -23,7 +23,7 @@
     <small>穿衣、洗车、运动、防晒、感冒提示</small>
 </footer>
 <script>
-const KEY = "你的和风天气KEY";
+const KEY = "ce986bb35e634271a49606ab2a226583";
 async function loadLife(){
     const res = await fetch(`https://devapi.qweather.com/v7/indices/1d?location=101180701&key=${KEY}&type=1,2,3,5,6`);
     const d = await res.json();
